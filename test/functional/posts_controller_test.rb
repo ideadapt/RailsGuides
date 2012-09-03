@@ -5,18 +5,29 @@ class PostsControllerTest < ActionController::TestCase
     @post = posts(:one)
   end
 
+  def auth
+    @request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("ia", "secret")
+  end
+
   test "should get index" do
     get :index
     assert_response :success
     assert_not_nil assigns(:posts)
   end
 
+  test "should NOT get new" do
+    get :new
+    assert_response 401
+  end
+
   test "should get new" do
+    auth
     get :new
     assert_response :success
   end
 
   test "should create post" do
+    auth
     assert_difference('Post.count') do
       post :create, post: { content: @post.content, name: @post.name, title: @post.title }
     end
@@ -30,16 +41,19 @@ class PostsControllerTest < ActionController::TestCase
   end
 
   test "should get edit" do
+    auth
     get :edit, id: @post
     assert_response :success
   end
 
   test "should update post" do
+    auth
     put :update, id: @post, post: { content: @post.content, name: @post.name, title: @post.title }
     assert_redirected_to post_path(assigns(:post))
   end
 
   test "should destroy post" do
+    auth
     assert_difference('Post.count', -1) do
       delete :destroy, id: @post
     end
